@@ -60,11 +60,11 @@ const FALLBACK_RECIPES: Recipe[] = [
  */
 export async function getPopularRecipes(limit: number = 6): Promise<Recipe[]> {
     try {
-        // Supabase query as specified in Spec Section 4.2
+        // Supabase query - using lowercase column names as PostgreSQL converts them
         const { data, error } = await supabase
             .from('recipes')
-            .select('id, name, imageUrl, totalTime, ingredientCount')
-            .order('viewCount', { ascending: false })
+            .select('id, name, imageurl, totaltime, ingredientcount')
+            .order('viewcount', { ascending: false })
             .limit(limit);
 
         // Error handling
@@ -82,8 +82,14 @@ export async function getPopularRecipes(limit: number = 6): Promise<Recipe[]> {
             return FALLBACK_RECIPES.slice(0, limit);
         }
 
-        // Return properly typed data
-        return data as Recipe[];
+        // Map database columns to TypeScript interface
+        return data.map(recipe => ({
+            id: recipe.id,
+            name: recipe.name,
+            imageUrl: recipe.imageurl,
+            totalTime: recipe.totaltime,
+            ingredientCount: recipe.ingredientcount,
+        })) as Recipe[];
 
     } catch (error) {
         // Only log on server-side
@@ -105,19 +111,31 @@ export async function getCuratedPopularRecipes(limit: number = 6): Promise<Recip
     try {
         const { data, error } = await supabase
             .from('recipes')
-            .select('id, name, imageUrl, totalTime, ingredientCount')
-            .eq('isPopular', true)
+            .select('id, name, imageurl, totaltime, ingredientcount')
+            .eq('ispopular', true)
             .limit(limit);
 
         if (error) {
-            console.error('Error fetching curated recipes:', error);
+            if (typeof window === 'undefined') {
+                console.error('Error fetching curated recipes:', error);
+            }
             return [];
         }
 
-        return (data as Recipe[]) || [];
+        if (!data) return [];
+
+        return data.map(recipe => ({
+            id: recipe.id,
+            name: recipe.name,
+            imageUrl: recipe.imageurl,
+            totalTime: recipe.totaltime,
+            ingredientCount: recipe.ingredientcount,
+        })) as Recipe[];
 
     } catch (error) {
-        console.error('Unexpected error in getCuratedPopularRecipes:', error);
+        if (typeof window === 'undefined') {
+            console.error('Unexpected error in getCuratedPopularRecipes:', error);
+        }
         return [];
     }
 }
@@ -132,19 +150,31 @@ export async function getTopRatedRecipes(limit: number = 6): Promise<Recipe[]> {
     try {
         const { data, error } = await supabase
             .from('recipes')
-            .select('id, name, imageUrl, totalTime, ingredientCount')
+            .select('id, name, imageurl, totaltime, ingredientcount')
             .order('rating', { ascending: false })
             .limit(limit);
 
         if (error) {
-            console.error('Error fetching top rated recipes:', error);
+            if (typeof window === 'undefined') {
+                console.error('Error fetching top rated recipes:', error);
+            }
             return [];
         }
 
-        return (data as Recipe[]) || [];
+        if (!data) return [];
+
+        return data.map(recipe => ({
+            id: recipe.id,
+            name: recipe.name,
+            imageUrl: recipe.imageurl,
+            totalTime: recipe.totaltime,
+            ingredientCount: recipe.ingredientcount,
+        })) as Recipe[];
 
     } catch (error) {
-        console.error('Unexpected error in getTopRatedRecipes:', error);
+        if (typeof window === 'undefined') {
+            console.error('Unexpected error in getTopRatedRecipes:', error);
+        }
         return [];
     }
 }
@@ -159,19 +189,31 @@ export async function getRecipeById(id: string): Promise<Recipe | null> {
     try {
         const { data, error } = await supabase
             .from('recipes')
-            .select('id, name, imageUrl, totalTime, ingredientCount')
+            .select('id, name, imageurl, totaltime, ingredientcount')
             .eq('id', id)
             .single();
 
         if (error) {
-            console.error(`Error fetching recipe ${id}:`, error);
+            if (typeof window === 'undefined') {
+                console.error(`Error fetching recipe ${id}:`, error);
+            }
             return null;
         }
 
-        return data as Recipe;
+        if (!data) return null;
+
+        return {
+            id: data.id,
+            name: data.name,
+            imageUrl: data.imageurl,
+            totalTime: data.totaltime,
+            ingredientCount: data.ingredientcount,
+        };
 
     } catch (error) {
-        console.error('Unexpected error in getRecipeById:', error);
+        if (typeof window === 'undefined') {
+            console.error('Unexpected error in getRecipeById:', error);
+        }
         return null;
     }
 }
@@ -186,19 +228,31 @@ export async function searchRecipes(query: string): Promise<Recipe[]> {
     try {
         const { data, error } = await supabase
             .from('recipes')
-            .select('id, name, imageUrl, totalTime, ingredientCount')
+            .select('id, name, imageurl, totaltime, ingredientcount')
             .ilike('name', `%${query}%`)
             .limit(20);
 
         if (error) {
-            console.error('Error searching recipes:', error);
+            if (typeof window === 'undefined') {
+                console.error('Error searching recipes:', error);
+            }
             return [];
         }
 
-        return (data as Recipe[]) || [];
+        if (!data) return [];
+
+        return data.map(recipe => ({
+            id: recipe.id,
+            name: recipe.name,
+            imageUrl: recipe.imageurl,
+            totalTime: recipe.totaltime,
+            ingredientCount: recipe.ingredientcount,
+        })) as Recipe[];
 
     } catch (error) {
-        console.error('Unexpected error in searchRecipes:', error);
+        if (typeof window === 'undefined') {
+            console.error('Unexpected error in searchRecipes:', error);
+        }
         return [];
     }
 }
@@ -216,12 +270,14 @@ export async function getRecipeDetail(id: string): Promise<RecipeDetail | null> 
     try {
         const { data, error } = await supabase
             .from('recipes')
-            .select('id, name, imageUrl, totalTime, ingredientCount, description, directions, full_ingredients, viewCount, rating, createdAt, updatedAt')
+            .select('id, name, imageurl, totaltime, ingredientcount, description, directions, full_ingredients, viewcount, rating, createdat, updatedat')
             .eq('id', id)
             .single();
 
         if (error) {
-            console.error(`Error fetching recipe detail ${id}:`, error);
+            if (typeof window === 'undefined') {
+                console.error(`Error fetching recipe detail ${id}:`, error);
+            }
             return null;
         }
 
@@ -229,11 +285,26 @@ export async function getRecipeDetail(id: string): Promise<RecipeDetail | null> 
             return null;
         }
 
-        // Type assertion with JSONB fields
-        return data as RecipeDetail;
+        // Map database columns to TypeScript interface
+        return {
+            id: data.id,
+            name: data.name,
+            imageUrl: data.imageurl,
+            totalTime: data.totaltime,
+            ingredientCount: data.ingredientcount,
+            description: data.description,
+            directions: data.directions,
+            full_ingredients: data.full_ingredients,
+            viewCount: data.viewcount,
+            rating: data.rating,
+            createdAt: data.createdat,
+            updatedAt: data.updatedat,
+        };
 
     } catch (error) {
-        console.error('Unexpected error in getRecipeDetail:', error);
+        if (typeof window === 'undefined') {
+            console.error('Unexpected error in getRecipeDetail:', error);
+        }
         return null;
     }
 }

@@ -44,12 +44,37 @@ export interface Recipe {
   ingredientCount: number;
 }
 
+// Recipe direction step structure (from JSONB)
+export interface RecipeDirection {
+  step: number;
+  instruction: string;
+}
+
+// Recipe ingredient structure (from JSONB)
+export interface RecipeIngredient {
+  name: string;
+  amount: number;
+  unit: string;
+  notes: string;
+}
+
 // Extended Recipe type for database (optional fields)
 export interface RecipeDatabase extends Recipe {
   description?: string;
   viewCount?: number;
   rating?: number;
   isPopular?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Full recipe detail including JSONB fields
+export interface RecipeDetail extends Recipe {
+  description: string;
+  directions: RecipeDirection[];
+  full_ingredients: RecipeIngredient[];
+  viewCount?: number;
+  rating?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -867,33 +892,135 @@ CREATE TABLE recipes (
   totalTime INTEGER NOT NULL, -- in minutes
   ingredientCount INTEGER NOT NULL,
   
+  -- JSONB columns for structured recipe data (required for recipe detail pages)
+  directions JSONB NOT NULL, -- Array of direction objects: [{step: 1, instruction: "Preheat oven..."}]
+  full_ingredients JSONB NOT NULL, -- Array of ingredient objects: [{name: "flour", amount: 2, unit: "cups", notes: "sifted"}]
+  
   -- Optional columns for popularity tracking
   viewCount INTEGER DEFAULT 0,
   rating NUMERIC(3, 2),
   isPopular BOOLEAN DEFAULT false,
+  description TEXT, -- Short description for recipe cards
   
   -- Timestamps
   createdAt TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updatedAt TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Index for performance
+-- Indexes for performance
 CREATE INDEX idx_recipes_viewCount ON recipes(viewCount DESC);
 CREATE INDEX idx_recipes_rating ON recipes(rating DESC);
 CREATE INDEX idx_recipes_isPopular ON recipes(isPopular) WHERE isPopular = true;
+
+-- GIN indexes for JSONB columns (enables efficient queries on JSONB data)
+CREATE INDEX idx_recipes_directions ON recipes USING GIN (directions);
+CREATE INDEX idx_recipes_full_ingredients ON recipes USING GIN (full_ingredients);
+```
+
+**JSONB Structure Examples**:
+
+```typescript
+// directions structure
+[
+  { "step": 1, "instruction": "Preheat oven to 350°F (175°C)" },
+  { "step": 2, "instruction": "Mix flour, sugar, and salt in a large bowl" },
+  { "step": 3, "instruction": "Add eggs and vanilla extract, mix until combined" }
+]
+
+// full_ingredients structure
+[
+  { "name": "all-purpose flour", "amount": 2, "unit": "cups", "notes": "sifted" },
+  { "name": "granulated sugar", "amount": 1, "unit": "cup", "notes": "" },
+  { "name": "salt", "amount": 0.5, "unit": "teaspoon", "notes": "" },
+  { "name": "eggs", "amount": 2, "unit": "large", "notes": "room temperature" }
+]
 ```
 
 ### 9.2 Sample Data for Testing
 
 ```sql
-INSERT INTO recipes (name, imageUrl, totalTime, ingredientCount, viewCount, rating, isPopular)
+INSERT INTO recipes (name, imageUrl, totalTime, ingredientCount, viewCount, rating, isPopular, description, directions, full_ingredients)
 VALUES
-  ('Grandma''s Apple Pie', '/images/apple-pie.jpg', 120, 8, 150, 4.9, true),
-  ('Classic Chocolate Chip Cookies', '/images/cookies.jpg', 45, 12, 200, 4.8, true),
-  ('Sunday Pot Roast', '/images/pot-roast.jpg', 240, 15, 100, 4.7, true),
-  ('Homemade Chicken Soup', '/images/chicken-soup.jpg', 90, 10, 120, 4.6, true),
-  ('Blueberry Pancakes', '/images/pancakes.jpg', 30, 9, 180, 4.8, true),
-  ('Baked Mac and Cheese', '/images/mac-cheese.jpg', 60, 11, 160, 4.7, true);
+  (
+    'Grandma''s Apple Pie',
+    '/images/apple-pie.jpg',
+    120,
+    8,
+    150,
+    4.9,
+    true,
+    'A classic apple pie recipe passed down through generations',
+    '[
+      {"step": 1, "instruction": "Preheat oven to 425°F (220°C)"},
+      {"step": 2, "instruction": "Mix sliced apples with sugar, cinnamon, and flour"},
+      {"step": 3, "instruction": "Place bottom crust in pie pan, add apple mixture"},
+      {"step": 4, "instruction": "Cover with top crust, seal edges, and cut vents"},
+      {"step": 5, "instruction": "Bake for 45-50 minutes until golden brown"}
+    ]'::jsonb,
+    '[
+      {"name": "apples", "amount": 6, "unit": "medium", "notes": "peeled and sliced"},
+      {"name": "granulated sugar", "amount": 0.75, "unit": "cup", "notes": ""},
+      {"name": "ground cinnamon", "amount": 1, "unit": "teaspoon", "notes": ""},
+      {"name": "all-purpose flour", "amount": 2, "unit": "tablespoons", "notes": ""},
+      {"name": "pie crust", "amount": 2, "unit": "9-inch", "notes": "homemade or store-bought"}
+    ]'::jsonb
+  ),
+  (
+    'Classic Chocolate Chip Cookies',
+    '/images/cookies.jpg',
+    45,
+    12,
+    200,
+    4.8,
+    true,
+    'Soft and chewy chocolate chip cookies that melt in your mouth',
+    '[
+      {"step": 1, "instruction": "Preheat oven to 375°F (190°C)"},
+      {"step": 2, "instruction": "Cream together butter and sugars until fluffy"},
+      {"step": 3, "instruction": "Beat in eggs and vanilla extract"},
+      {"step": 4, "instruction": "Mix in flour, baking soda, and salt"},
+      {"step": 5, "instruction": "Fold in chocolate chips"},
+      {"step": 6, "instruction": "Drop rounded tablespoons onto baking sheet"},
+      {"step": 7, "instruction": "Bake for 9-11 minutes until golden"}
+    ]'::jsonb,
+    '[
+      {"name": "butter", "amount": 1, "unit": "cup", "notes": "softened"},
+      {"name": "granulated sugar", "amount": 0.75, "unit": "cup", "notes": ""},
+      {"name": "brown sugar", "amount": 0.75, "unit": "cup", "notes": "packed"},
+      {"name": "eggs", "amount": 2, "unit": "large", "notes": ""},
+      {"name": "vanilla extract", "amount": 2, "unit": "teaspoons", "notes": ""},
+      {"name": "all-purpose flour", "amount": 2.25, "unit": "cups", "notes": ""},
+      {"name": "baking soda", "amount": 1, "unit": "teaspoon", "notes": ""},
+      {"name": "salt", "amount": 1, "unit": "teaspoon", "notes": ""},
+      {"name": "chocolate chips", "amount": 2, "unit": "cups", "notes": "semi-sweet"}
+    ]'::jsonb
+  ),
+  (
+    'Sunday Pot Roast',
+    '/images/pot-roast.jpg',
+    240,
+    15,
+    100,
+    4.7,
+    true,
+    'Tender pot roast with vegetables, perfect for Sunday dinner',
+    '[
+      {"step": 1, "instruction": "Preheat oven to 325°F (165°C)"},
+      {"step": 2, "instruction": "Season roast with salt and pepper, sear all sides in Dutch oven"},
+      {"step": 3, "instruction": "Remove roast, sauté onions and garlic"},
+      {"step": 4, "instruction": "Return roast to pot, add broth, wine, and herbs"},
+      {"step": 5, "instruction": "Cover and roast for 3 hours, add vegetables last hour"}
+    ]'::jsonb,
+    '[
+      {"name": "chuck roast", "amount": 3, "unit": "pounds", "notes": ""},
+      {"name": "onions", "amount": 2, "unit": "large", "notes": "quartered"},
+      {"name": "carrots", "amount": 6, "unit": "medium", "notes": "cut into chunks"},
+      {"name": "potatoes", "amount": 4, "unit": "large", "notes": "quartered"},
+      {"name": "beef broth", "amount": 2, "unit": "cups", "notes": ""},
+      {"name": "red wine", "amount": 1, "unit": "cup", "notes": ""},
+      {"name": "garlic", "amount": 4, "unit": "cloves", "notes": "minced"}
+    ]'::jsonb
+  );
 ```
 
 ---

@@ -2,6 +2,54 @@ import { supabase } from '@/lib/supabase/server';
 import { Recipe, RecipeDetail } from '@/lib/types';
 
 /**
+ * Fallback recipe data (used when database is unavailable)
+ */
+const FALLBACK_RECIPES: Recipe[] = [
+    {
+        id: '1',
+        name: 'Grandma\'s Apple Pie',
+        imageUrl: 'https://placehold.co/800x600/fef3c7/92400e?text=Apple+Pie&font=roboto',
+        totalTime: 120,
+        ingredientCount: 8,
+    },
+    {
+        id: '2',
+        name: 'Classic Chocolate Chip Cookies',
+        imageUrl: 'https://placehold.co/800x600/fed7aa/9a3412?text=Chocolate+Cookies&font=roboto',
+        totalTime: 45,
+        ingredientCount: 12,
+    },
+    {
+        id: '3',
+        name: 'Sunday Pot Roast',
+        imageUrl: 'https://placehold.co/800x600/fecaca/991b1b?text=Pot+Roast&font=roboto',
+        totalTime: 240,
+        ingredientCount: 15,
+    },
+    {
+        id: '4',
+        name: 'Homemade Margherita Pizza',
+        imageUrl: 'https://placehold.co/800x600/fee2e2/dc2626?text=Margherita+Pizza&font=roboto',
+        totalTime: 30,
+        ingredientCount: 7,
+    },
+    {
+        id: '5',
+        name: 'Creamy Chicken Alfredo',
+        imageUrl: 'https://placehold.co/800x600/fef9c3/854d0e?text=Chicken+Alfredo&font=roboto',
+        totalTime: 35,
+        ingredientCount: 10,
+    },
+    {
+        id: '6',
+        name: 'Classic Caesar Salad',
+        imageUrl: 'https://placehold.co/800x600/d9f99d/365314?text=Caesar+Salad&font=roboto',
+        totalTime: 20,
+        ingredientCount: 9,
+    },
+];
+
+/**
  * Fetch popular recipes from Supabase
  * 
  * This function demonstrates Supabase JavaScript client usage in a Next.js Server Component
@@ -21,22 +69,29 @@ export async function getPopularRecipes(limit: number = 6): Promise<Recipe[]> {
 
         // Error handling
         if (error) {
-            console.error('Error fetching popular recipes:', error);
-            throw new Error(`Failed to fetch popular recipes: ${error.message}`);
+            // Only log on server-side (not in browser console)
+            if (typeof window === 'undefined') {
+                console.error('Error fetching popular recipes:', error);
+            }
+            // Return fallback data instead of throwing
+            return FALLBACK_RECIPES.slice(0, limit);
         }
 
         // Data validation and type safety
-        if (!data) {
-            return [];
+        if (!data || data.length === 0) {
+            return FALLBACK_RECIPES.slice(0, limit);
         }
 
         // Return properly typed data
         return data as Recipe[];
 
     } catch (error) {
-        console.error('Unexpected error in getPopularRecipes:', error);
-        // Return empty array for graceful degradation
-        return [];
+        // Only log on server-side
+        if (typeof window === 'undefined') {
+            console.error('Unexpected error in getPopularRecipes:', error);
+        }
+        // Return fallback data for graceful degradation
+        return FALLBACK_RECIPES.slice(0, limit);
     }
 }
 

@@ -29,7 +29,7 @@ export interface SiteMetadata {
 const FALLBACK_HERO_CONFIG: HeroConfig = {
     heading: 'Welcome to Generational Spoons',
     subheading: 'Preserving family recipes, one dish at a time',
-    imageUrl: '/images/hero-image.jpg',
+    imageUrl: 'https://placehold.co/1920x1080/e2e8f0/1e293b?text=Family+Kitchen&font=roboto',
     imageAlt: 'Family cooking together in a warm kitchen',
 };
 
@@ -62,11 +62,7 @@ const FALLBACK_SITE_METADATA: SiteMetadata = {
 };
 
 /**
- * Generic function to fetch configuration from database
- * 
- * @param key - Configuration key
- * @param fallback - Fallback value if database fetch fails
- * @returns Configuration value
+ * Generic config fetcher with fallback
  */
 async function getConfig<T>(key: string, fallback: T): Promise<T> {
     try {
@@ -77,18 +73,19 @@ async function getConfig<T>(key: string, fallback: T): Promise<T> {
             .single();
 
         if (error) {
-            console.error(`Error fetching config '${key}':`, error);
+            // Only log on server-side (not in browser console)
+            if (typeof window === 'undefined') {
+                console.error(`Error fetching config '${key}':`, error);
+            }
             return fallback;
         }
 
-        if (!data || !data.value) {
-            console.warn(`No config found for key '${key}', using fallback`);
-            return fallback;
-        }
-
-        return data.value as T;
+        return (data?.value as T) || fallback;
     } catch (error) {
-        console.error(`Unexpected error fetching config '${key}':`, error);
+        // Only log on server-side
+        if (typeof window === 'undefined') {
+            console.error(`Unexpected error fetching config '${key}':`, error);
+        }
         return fallback;
     }
 }

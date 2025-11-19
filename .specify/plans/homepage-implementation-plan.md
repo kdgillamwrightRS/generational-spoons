@@ -593,7 +593,7 @@ const defaultSocialLinks = [
   },
   {
     platform: 'portfolio' as const,
-    url: 'https://kaylagw.com',
+    url: 'https://kd.gillamwright.com',
     ariaLabel: 'Portfolio website',
   },
 ];

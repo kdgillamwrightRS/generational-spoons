@@ -29,7 +29,7 @@ export interface SiteMetadata {
 const FALLBACK_HERO_CONFIG: HeroConfig = {
     heading: 'Welcome to Generational Spoons',
     subheading: 'Preserving family recipes, one dish at a time',
-    imageUrl: 'https://placehold.co/1920x1080/e2e8f0/1e293b?text=Family+Kitchen&font=roboto',
+    imageUrl: '/images/hero-image.png',
     imageAlt: 'Family cooking together in a warm kitchen',
 };
 
@@ -49,7 +49,7 @@ const FALLBACK_FOOTER_CONFIG: FooterConfig = {
         },
         {
             platform: 'portfolio',
-            url: 'https://kaylagw.com',
+            url: 'https://kd.gillamwright.com',
             ariaLabel: 'Portfolio website',
         },
     ],

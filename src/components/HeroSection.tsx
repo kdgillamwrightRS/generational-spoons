@@ -4,7 +4,7 @@ import { HeroSectionProps } from '@/lib/types';
 
 export default function HeroSection({ heroImage, welcomeMessage }: HeroSectionProps) {
     return (
-        <section className="relative h-[60vh] md:h-[70vh] lg:h-[80vh]">
+        <section className="relative h-[40vh]">
             {/* Hero Image */}
             <Image
                 src={heroImage.src}
@@ -22,15 +22,36 @@ export default function HeroSection({ heroImage, welcomeMessage }: HeroSectionPr
             <div className="relative h-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-4xl">
                     {/* Welcome Message */}
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-                        {welcomeMessage.heading}
+                    <p
+                        className="text-xl lg:text-2xl text-white/90 mb-1"
+                        style={{
+                            textShadow:
+                                '0 2px 8px rgba(0,0,0,0.95), 0 4px 24px rgba(0,0,0,1), 0 0 2px #000, 0 0 1px #000',
+                        }}
+                    >
+                        Welcome to
+                    </p>
+                    <h1
+                        className="text-4xl lg:text-5xl font-bold text-white mb-2"
+                        style={{
+                            textShadow:
+                                '0 2px 8px rgba(0,0,0,0.95), 0 4px 24px rgba(0,0,0,1), 0 0 2px #000, 0 0 1px #000',
+                        }}
+                    >
+                        Generational Spoons
                     </h1>
-                    <p className="text-lg md:text-xl text-white/90 mb-8">
+                    <p
+                        className="text-sm lg:text-xl text-white/90 mb-4"
+                        style={{
+                            textShadow:
+                                '0 2px 8px rgba(0,0,0,0.95), 0 4px 24px rgba(0,0,0,1), 0 0 2px #000, 0 0 1px #000',
+                        }}
+                    >
                         {welcomeMessage.subheading}
                     </p>
 
                     {/* Search Bar */}
-                    <div className="max-w-2xl mx-auto">
+                    <div>
                         <SearchBar placeholder="Search recipes..." />
                     </div>
                 </div>

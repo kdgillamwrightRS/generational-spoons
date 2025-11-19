@@ -1,7 +1,5 @@
-import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
 import PopularRecipesSection from '@/components/PopularRecipesSection';
-import Footer from '@/components/Footer';
 import { getHeroConfig } from '@/lib/data/config';
 
 export default async function HomePage() {
@@ -20,13 +18,9 @@ export default async function HomePage() {
     };
 
     return (
-        <>
-            <Navigation />
-            <main>
-                <HeroSection {...heroData} />
-                <PopularRecipesSection limit={6} />
-            </main>
-            <Footer />
-        </>
+        <main className="">
+            <HeroSection {...heroData} />
+            <PopularRecipesSection limit={6} />
+        </main>
     );
 }

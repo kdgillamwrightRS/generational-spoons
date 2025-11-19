@@ -1,3 +1,28 @@
+/* Make all recipe cards in the grid match the tallest card in the entire grid */
+.recipe-grid-full-height {
+  align-items: stretch;
+}
+
+.recipe-grid-full-height>* {
+  height: 100%;
+}
+
+/* Responsive grid wrapper for PopularRecipesSection: keep black background and padding at <768px */
+@media (max-width: 768px) {
+  .responsive-grid-wrapper {
+    background: #000 !important;
+    padding: 12px !important;
+    border-radius: 12px;
+  }
+}
+
+/* Custom grid-cols-1 below 500px for PopularRecipesSection */
+@media (max-width: 500px) {
+  .custom-cols-1-under-500 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+}
+
 @import "tailwindcss";
 
 /* Custom utilities for Generational Spoons */
@@ -9,6 +34,12 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+}
+
+/* Dark theme with high contrast */
+body {
+  background-color: #000000;
+  color: #ffffff;
 }
 
 /* Print styles for recipe pages */

@@ -6,11 +6,11 @@ export default async function Navigation() {
     const navigationLinks = await getNavigationLinks();
 
     return (
-        <nav className="sticky top-0 z-50 bg-white shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
+        <nav className="sticky top-0 z-50 bg-black shadow-sm" style={{ fontFamily: 'var(--font-caveat)' }}>
+            <div className="w-full md:mx-auto">
+                <div className="flex justify-between items-center h-16 w-full.    ">
                     {/* Logo/Title */}
-                    <Link href="/" className="text-2xl font-bold text-gray-900">
+                    <Link href="/" className="text-lg font-bold text-amber-600 hover:text-amber-500 transition-colors">
                         Generational Spoons
                     </Link>
 
@@ -20,7 +20,7 @@ export default async function Navigation() {
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                                className="text-white hover:text-gray-300 font-medium transition-colors text-lg"
                             >
                                 {link.label}
                             </Link>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Caveat, Lora } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
+import NavigationClient from "@/components/NavigationClient";
 import Footer from "@/components/Footer";
 
 const caveat = Caveat({
@@ -28,11 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${caveat.variable} ${lora.variable} antialiased`} style={{ fontFamily: 'var(--font-lora)' }}>
+      <body className={`${caveat.variable} ${lora.variable} antialiased`} style={{ fontFamily: 'var(--font-lora)', minWidth: '365px' }}>
         <div className="w-[90%] sm:w-4/5 mx-auto">
-          <Navigation />
+          <NavigationClient />
           {children}
-          <Footer />
+          <div className="print:hidden">
+            <Footer />
+          </div>
         </div>
       </body>
     </html>

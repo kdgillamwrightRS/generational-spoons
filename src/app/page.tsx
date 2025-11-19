@@ -1,17 +1,32 @@
-import React from 'react';
+import Navigation from '@/components/Navigation';
+import HeroSection from '@/components/HeroSection';
+import PopularRecipesSection from '@/components/PopularRecipesSection';
+import Footer from '@/components/Footer';
+import { getHeroConfig } from '@/lib/data/config';
 
-export default function Home() {
+export default async function HomePage() {
+    // Fetch hero section configuration from database (with fallback)
+    const heroConfig = await getHeroConfig();
+
+    const heroData = {
+        heroImage: {
+            src: heroConfig.imageUrl,
+            alt: heroConfig.imageAlt,
+        },
+        welcomeMessage: {
+            heading: heroConfig.heading,
+            subheading: heroConfig.subheading,
+        },
+    };
+
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center p-24">
-            <h1 className="text-4xl font-extrabold mb-8">
-                Welcome to my Project!
-            </h1>
-
-            {/* add components you want to include here */}
-
-            <p className="mt-8 text-gray-500">
-                Your Tailwind CSS is also ready to use.
-            </p>
-        </main>
+        <>
+            <Navigation />
+            <main>
+                <HeroSection {...heroData} />
+                <PopularRecipesSection limit={6} />
+            </main>
+            <Footer />
+        </>
     );
 }

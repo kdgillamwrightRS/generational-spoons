@@ -1,0 +1,13 @@
+This is a placeholder file. The actual image will be served from an external placeholder service.
+
+For development, we're using placeholder.co which provides on-demand placeholder images.
+
+The recipe images are referenced in the database as local paths (e.g., /images/apple-pie.jpg),
+but Next.js will handle these gracefully even if they don't exist initially.
+
+To add real images:
+1. Replace this file with an actual JPG image (800x600px, 4:3 aspect ratio)
+2. Or upload to Supabase Storage and update the database URLs
+
+Current placeholder URL pattern:
+https://placehold.co/800x600/e2e8f0/1e293b?text=Recipe+Name

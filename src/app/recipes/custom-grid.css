@@ -1,0 +1,5 @@
+@media (max-width: 450px) {
+    .grid-cols-custom-xs {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}

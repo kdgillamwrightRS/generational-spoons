@@ -19,19 +19,32 @@ export default function SearchBar({ placeholder = 'Search recipes...' }: SearchB
     };
 
     return (
-        <form onSubmit={handleSearch} className="w-3/5 mx-auto">
-            <div className="relative max-w-lg mx-auto">
+        <form onSubmit={handleSearch} className="ml-auto" style={{ maxWidth: '14rem', width: '100%' }}>
+            <div className="relative" style={{ maxWidth: '14rem', width: '100%' }}>
                 <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={placeholder}
-                    className="text-black w-full px-2 text-sm xl:text-md focus:outline-none shadow-lg bg-white/60 backdrop-blur-xl border border-white/40"
+                    className="w-full px-1 text-white text-xs focus:outline-none shadow-xl placeholder-white/70 placeholder:text-xs h-5"
+                    style={{
+                        background: 'linear-gradient(to bottom, #666 0%, #444 100%)',
+                        color: 'white',
+                        border: 'none',
+                        boxShadow: '0 8px 32px 0 rgba(0,0,0,0.25)',
+                        backdropFilter: 'blur(14px)',
+                        WebkitBackdropFilter: 'blur(14px)',
+                        fontWeight: 500,
+                        letterSpacing: '0.01em',
+                        borderRadius: 0,
+                        height: '1.5rem',
+                    }}
                 />
                 <button
                     type="submit"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 hover:text-blue-600 px-1 rounded-full transition-colors"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 hover:text-yellow-400 px-1 rounded-full transition-colors"
                     aria-label="Search"
+                    style={{ paddingLeft: '0.25rem', paddingRight: '0.25rem' }}
                 >
                     <SearchIcon />
                 </button>

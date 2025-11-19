@@ -8,6 +8,7 @@ export default function FilterDropdown({
     label,
     options,
     initialValue,
+    onSelect,
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState(initialValue);
@@ -17,7 +18,7 @@ export default function FilterDropdown({
     const handleSelect = (value) => {
         setSelectedValue(value);
         setIsOpen(false);
-        // onSelect(value);
+        if (onSelect) onSelect(value);
     };
 
     // Set a fixed width for the dropdown and menu (further reduced width)

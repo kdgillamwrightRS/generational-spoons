@@ -50,6 +50,47 @@ const FALLBACK_RECIPES: Recipe[] = [
 ];
 
 /**
+ * Fetch all recipes from Supabase
+ * Used for the All Recipes index page
+ * @returns Array of Recipe objects with required fields
+ */
+export async function getAllRecipes(): Promise<Recipe[]> {
+    try {
+        const { data, error } = await supabase
+            .from('recipes')
+            .select('id, name, imageurl, totaltime, ingredientcount')
+            .order('name', { ascending: true });
+
+        if (error) {
+            if (typeof window === 'undefined') {
+                console.error('Error fetching all recipes:', error);
+            }
+            // Fallback to all fallback recipes, sorted alphabetically
+            return [...FALLBACK_RECIPES].sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        if (!data || data.length === 0) {
+            return [...FALLBACK_RECIPES].sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        return data
+            .map(recipe => ({
+                id: recipe.id,
+                name: recipe.name,
+                imageUrl: recipe.imageurl,
+                totalTime: recipe.totaltime,
+                ingredientCount: recipe.ingredientcount,
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name)) as Recipe[];
+    } catch (error) {
+        if (typeof window === 'undefined') {
+            console.error('Unexpected error in getAllRecipes:', error);
+        }
+        return [...FALLBACK_RECIPES].sort((a, b) => a.name.localeCompare(b.name));
+    }
+}
+
+/**
  * Fetch popular recipes from Supabase
  * 
  * This function demonstrates Supabase JavaScript client usage in a Next.js Server Component

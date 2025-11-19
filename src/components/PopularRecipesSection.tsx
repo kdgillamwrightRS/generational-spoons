@@ -52,8 +52,7 @@ export default async function PopularRecipesSection({
                     <ClientFilterDropdown
                         label="Sort by"
                         initialValue=""
-                        options={filterOptions}
-                    // In a real application, you would pass a function here 
+                        options={filterOptions} onSelect={undefined}                    // In a real application, you would pass a function here 
                     // to handle the sorting/filtering of the recipes, perhaps 
                     // by using a URL search parameter (`useSearchParams`).
                     />
